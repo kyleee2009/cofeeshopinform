@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Coffee & Bread Shop</title>
+<style>
+  :root {
+    --warm-brown: #6f4e37;
+    --light-beige: #f4ede3;
+    --dark-brown: #3e2733;
+    --accent-orange: #c95f3e;
+    --text-dark: #2a1a1a;
+    --card-bg: #fff7f0;
+    --shadow-color: rgba(111, 78, 55, 0.4);
+    --font-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    font-family: var(--font-primary);
+    background-color: var(--light-beige);
+    color: var(--text-dark);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  header {
+    background: var(--warm-brown);
+    color: var(--light-beige);
+    padding: 1.5rem 2rem;
+    text-align: center;
+    box-shadow: 0 2px 6px var(--shadow-color);
+  }
+  header h1 {
+    font-weight: 700;
+    font-size: 2.75rem;
+    letter-spacing: 2px;
+    margin: 0;
+    user-select: none;
+  }
+  header p {
+    margin-top: 0.25rem;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 1.25rem;
+  }
+  main {
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 0 1rem 4rem;
+  }
+  .tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+    gap: 2rem;
+  }
+  .tab-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--warm-brown);
+    cursor: pointer;
+    padding: 0.5rem 1.5rem;
+    border-radius: 30px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    user-select: none;
+  }
+  .tab-btn.active,
+  .tab-btn:hover {
+    background-color: var(--accent-orange);
+    color: var(--light-beige);
+    box-shadow: 0 6px 12px rgba(201, 95, 62, 0.6);
+  }
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.8rem;
+  }
+  .product-card {
+    background-color: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: 0 6px 14px var(--shadow-color);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    position: relative;
+  }
+  .product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 24px var(--shadow-color);
+  }
+  .product-image {
+    max-height: 160px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    user-select: none;
+    box-shadow: 0 4px 12px rgba(111, 78, 55, 0.3);
+  }
+  .product-name {
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin: 0 0 0.25rem 0;
+    flex-grow: 0;
+    color: var(--dark-brown);
+  }
+  .product-description {
+    font-size: 0.9rem;
+    color: #5a3e2b;
+    flex-grow: 1;
+    margin-bottom: 0.75rem;
+  }
+  .product-price {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--accent-orange);
+    margin-bottom: 0.5rem;
+  }
+  .add-cart-btn {
+    background-color: var(--warm-brown);
+    border: none;
+    padding: 0.5rem 1rem;
+    color: var(--light-beige);
+    font-weight: 600;
+    border-radius: 30px;
+    cursor: pointer;
+    align-self: flex-start;
+    transition: background-color 0.3s ease;
+    user-select: none;
+  }
+  .add-cart-btn:hover {
+    background-color: var(--dark-brown);
+  }
+
+  /* Cart badge & modal */
+  #cart-btn {
+    position: fixed;
+    top: 1.25rem;
+    right: 1.5rem;
+    background-color: var(--accent-orange);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    border: none;
+    color: var(--light-beige);
+    font-size: 1.4rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(201, 95, 62, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    user-select: none;
+  }
+  #cart-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background-color: #f44336;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #cart-modal {
+    position: fixed;
+    top: 60px;
+    right: 1.5rem;
+    background-color: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: 0 6px 24px var(--shadow-color);
+    width: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 1rem;
+    display: none;
+    z-index: 1001;
+  }
+  #cart-modal h3 {
+    margin-top: 0;
+    font-weight: 700;
+    color: var(--dark-brown);
+    user-select: none;
+  }
+  #cart-items {
+    list-style: none;
+    padding-left: 0;
+    margin: 0.5rem 0 0 0;
+  }
+  #cart-items li {
+    border-bottom: 1px solid #d6bbad;
+    padding: 0.5rem 0;
+    font-size: 0.95rem;
+    color: var(--warm-brown);
+    display: flex;
+    justify-content: space-between;
+    user-select: none;
+  }
+  #cart-empty {
+    color: #7d5136;
+    font-style: italic;
+  }
+  #close-cart {
+    cursor: pointer;
+    font-weight: 700;
+    float: right;
+    font-size: 1.2rem;
+    color: var(--accent-orange);
+  }
+  /* Responsive */
+  @media (max-width: 600px) {
+    header h1 {
+      font-size: 2rem;
+    }
+    header p {
+      font-size: 1rem;
+    }
+    main {
+      margin: 1.5rem auto;
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Coffee & Bread Haven</h1>
+  <p>Inviting you to taste the finest coffees and breads</p>
+</header>
+
+<button id="cart-btn" aria-label="View cart">
+  🛒
+  <span id="cart-badge" style="display:none">0</span>
+</button>
+
+<div id="cart-modal" role="dialog" aria-modal="true" aria-labelledby="cart-title">
+  <span id="close-cart" title="Close cart">&times;</span>
+  <h3 id="cart-title">Your Cart</h3>
+  <ul id="cart-items">
+    <li id="cart-empty">Your cart is empty.</li>
+  </ul>
+</div>
+
+<main>
+  <nav class="tabs" role="tablist" aria-label="Product categories">
+    <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="coffee-section" id="tab-coffee">Coffee</button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="bread-section" id="tab-bread">Bread</button>
+  </nav>
+
+  <section id="coffee-section" role="tabpanel" aria-labelledby="tab-coffee">
+    <div class="products-grid">
+      <article class="product-card" tabindex="0" aria-label="Espresso coffee, price 25k IDR">
+        <img src="https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=400&q=80" alt="Cup of Espresso" class="product-image" />
+        <h2 class="product-name">Espresso</h2>
+        <p class="product-description">Strong and pure coffee shot with a rich, bold taste.</p>
+        <div class="product-price">25k IDR</div>
+        <button class="add-cart-btn" aria-label="Add Espresso to cart">Add to Cart</button>
+      </article>
+      <article class="product-card" tabindex="0" aria-label="Cappuccino coffee, price 35k IDR">
+        <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=400&q=80" alt="Cup of Cappuccino" class="product-image" />
+        <h2 class="product-name">Cappuccino</h2>
+        <p class="product-description">Espresso with steamed milk foam, smooth and aromatic.</p>
+        <div class="product-price">35k IDR</div>
+        <button class="add-cart-btn" aria-label="Add Cappuccino to cart">Add to Cart</button>
+      </article>
+      <article class="product-card" tabindex="0" aria-label="Latte coffee, price 38k IDR">
+        <img src="https://images.unsplash.com/photo-1529655683826-aba9b3e77383?auto=format&fit=crop&w=400&q=80" alt="Cup of Latte" class="product-image" />
+        <h2 class="product-name">Latte</h2>
+        <p class="product-description">Creamy coffee with steamed milk and light foam.</p>
+        <div class="product-price">38k IDR</div>
+        <button class="add-cart-btn" aria-label="Add Latte to cart">Add to Cart</button>
+      </article>
+      <article class="product-card" tabindex="0" aria-label="Cold Brew coffee, price 40k IDR">
+        <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=400&q=80" alt="Glass of Cold Brew" class="product-image" />
+        <h2 class="product-name">Cold Brew</h2>
+        <p class="product-description">Cold steeped coffee with smooth and refreshing flavor.</p>
+        <div class="product-price">40k IDR</div>
+        <button class="add-cart-btn" aria-label="Add Cold Brew to cart">Add to Cart</button>
+      </article>
+    </div>
+  </section>
+
+  <section id="bread-section" role="tabpanel" aria-labelledby="tab-bread" hidden>
+    <div class="products-grid">
+      <article class="product-card" tabindex="0" aria-label="Croissant bread, price 28k IDR">
+        <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80" alt="Croissant bread" class="product-image" />
+        <h2 class="product-name">Croissant</h2>
+        <p class="product-description">Flaky buttery French pastry to complement your coffee.</p>
+        <div class="product-price">28k IDR</div>
+        <button class="add-cart-btn" aria-label="Add Croissant to cart">Add to Cart</button>
+      </article>
+      <article class="product-card" tabindex="0" aria-label="Banana Bread, price 32k IDR">
+        <img src="https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?auto=format&fit=crop&w=400&q=80" alt="Banana Bread" class="product-image" />
+        <h2 class="product-name">Banana Bread</h2>
+        <p class="product-description">Moist and sweet banana bread, freshly baked daily.</p>
+        <div class="product-price">32k IDR</div>
+        <button class="add-cart-btn" aria-label="Add Banana Bread to cart">Add to Cart</button>
+      </article>
+      <article class="product-card" tabindex="0" aria-label="Multigrain bread, price 30k IDR">
+        <img src="https://images.unsplash.com/photo-1585238342029-f9f2740e79e6?auto=format&fit=crop&w=400&q=80" alt="Multigrain Bread" class="product-image" />
+        <h2 class="product-name">Multigrain Bread</h2>
+        <p class="product-description">Healthy multigrain bread with a nutty texture.</p>
+        <div class="product-price">30k IDR</div>
+        <button class="add-cart-btn" aria-label="Add Multigrain Bread to cart">Add to Cart</button>
+      </article>
+      <article class="product-card" tabindex="0" aria-label="Chocolate Bread, price 35k IDR">
+        <img src="https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=400&q=80" alt="Chocolate Bread" class="product-image" />
+        <h2 class="product-name">Chocolate Bread</h2>
+        <p class="product-description">Soft bread with a rich chocolate filling inside.</p>
+        <div class="product-price">35k IDR</div>
+        <button class="add-cart-btn" aria-label="Add Chocolate Bread to cart">Add to Cart</button>
+      </article>
+    </div>
+  </section>
+</main>
+
+<script>
+  (() => {
+    const tabs = document.querySelectorAll('.tab-btn');
+    const panels = {
+      coffee: document.getElementById('coffee-section'),
+      bread: document.getElementById('bread-section')
+    };
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Set active tab and aria-selected
+        tabs.forEach(t => {
+          const isCurrent = t === tab;
+          t.classList.toggle('active', isCurrent);
+          t.setAttribute('aria-selected', isCurrent);
+        });
+        // Show/hide panels
+        if (tab.id === 'tab-coffee') {
+          panels.coffee.hidden = false;
+          panels.bread.hidden = true;
+          panels.coffee.focus();
+        } else {
+          panels.coffee.hidden = true;
+          panels.bread.hidden = false;
+          panels.bread.focus();
+        }
+      });
+    });
+
+    // Cart functionality
+    const cartBtn = document.getElementById('cart-btn');
+    const cartBadge = document.getElementById('cart-badge');
+    const cartModal = document.getElementById('cart-modal');
+    const closeCartBtn = document.getElementById('close-cart');
+    const cartItemsList = document.getElementById('cart-items');
+    const cartEmptyMsg = document.getElementById('cart-empty');
+
+    let cartItems = [];
+
+    function updateCartUI() {
+      // Clear current items except the empty message
+      cartItemsList.innerHTML = '';
+      if (cartItems.length === 0) {
+        cartEmptyMsg.style.display = 'block';
+        cartItemsList.appendChild(cartEmptyMsg);
+        cartBadge.style.display = 'none';
+      } else {
+        cartEmptyMsg.style.display = 'none';
+        cartItems.forEach(item => {
+          const li = document.createElement('li');
+          li.textContent = `${item.name} x${item.quantity}`;
+          const spanPrice = document.createElement('span');
+          spanPrice.textContent = `IDR ${item.price * item.quantity}k`;
+          li.appendChild(spanPrice);
+          cartItemsList.appendChild(li);
+        });
+        cartBadge.style.display = 'flex';
+        cartBadge.textContent = cartItems.reduce((acc, i) => acc + i.quantity, 0);
+      }
+    }
+
+    function addToCart(product) {
+      const existing = cartItems.find(i => i.name === product.name);
+      if (existing) {
+        existing.quantity++;
+      } else {
+        cartItems.push({ ...product, quantity: 1 });
+      }
+      updateCartUI();
+    }
+
+    document.querySelectorAll('.add-cart-btn').forEach(button => {
+      button.addEventListener('click', e => {
+        e.stopPropagation();
+        const card = e.target.closest('.product-card');
+        const name = card.querySelector('.product-name').textContent;
+        const priceText = card.querySelector('.product-price').textContent;
+        // Extract number from 'XXk IDR' format
+        const price = parseInt(priceText.match(/(\d+)/)[0]);
+        addToCart({ name, price });
+      });
+    });
+
+    cartBtn.addEventListener('click', () => {
+      if (cartModal.style.display === 'block') {
+        cartModal.style.display = 'none';
+      } else {
+        cartModal.style.display = 'block';
+      }
+    });
+
+    closeCartBtn.addEventListener('click', () => {
+      cartModal.style.display = 'none';
+    });
+
+    // Close cart if clicking outside cart modal
+    document.addEventListener('click', (e) => {
+      if (!cartModal.contains(e.target) && !cartBtn.contains(e.target)) {
+        cartModal.style.display = 'none';
+      }
+    });
+
+    // Keyboard navigation for cart modal close (Escape)
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && cartModal.style.display === 'block') {
+        cartModal.style.display = 'none';
+        cartBtn.focus();
+      }
+    });
+
+    // Accessibility: focus management on tab switch
+    tabs.forEach(tab => {
+      tab.addEventListener('keydown', e => {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+          e.preventDefault();
+          let index = Array.from(tabs).indexOf(e.target);
+          if (e.key === 'ArrowRight') {
+            index = (index + 1) % tabs.length;
+          } else {
+            index = (index - 1 + tabs.length) % tabs.length;
+          }
+          tabs[index].focus();
+        }
+      });
+    });
+
+  })();
+</script>
+</body>
+</html>
+
